@@ -1,0 +1,1156 @@
+<title>Signal Room</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+
+  :root{
+    --bg: #120c2c;
+    --bg-deep: #0c0820;
+    --panel-dark: #1c1548;
+    --panel-dark-edge: #322a6e;
+    --surface: #fdfcff;
+    --surface-muted: #f2effa;
+    --surface-edge: #e3ddf4;
+    --ink: #15102e;
+    --ink-soft: #5c5580;
+    --ink-faint: #8b84ab;
+    --teal: #0f9488;
+    --teal-deep: #0a6f66;
+    --teal-tint: #d8f3ef;
+    --amber: #f2790a;
+    --amber-deep: #c85f05;
+    --amber-tint: #fde7cf;
+    --success: #1c9a53;
+    --success-tint: #dcf3e4;
+    --danger: #d94747;
+    --danger-tint: #fbe1e1;
+    --font-display: 'Sora', system-ui, sans-serif;
+    --font-body: 'Public Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  }
+
+  html.reading-mode{
+    --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  html.reading-mode body{ letter-spacing: 0.01em; }
+  html.reading-mode p, html.reading-mode li, html.reading-mode label, html.reading-mode .prompt{
+    line-height: 1.75;
+  }
+
+  h1,h2,h3{ font-family: var(--font-display); text-wrap: balance; margin: 0; }
+  p{ margin: 0; }
+  button{ font-family: inherit; }
+  :focus-visible{ outline: 3px solid var(--amber); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  /* ---------- layout shells ---------- */
+  .page{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 20px 64px;
+  }
+
+  header.hero{
+    background:
+      radial-gradient(circle at 8% 20%, rgba(15,148,136,0.35), transparent 45%),
+      radial-gradient(circle at 92% 80%, rgba(242,121,10,0.22), transparent 40%),
+      repeating-linear-gradient(90deg, rgba(216,208,255,0.06) 0 1px, transparent 1px 84px),
+      repeating-linear-gradient(0deg, rgba(216,208,255,0.06) 0 1px, transparent 1px 84px),
+      linear-gradient(160deg, var(--bg-deep), var(--panel-dark) 70%);
+    border-bottom: 1px solid var(--panel-dark-edge);
+    padding-block: 28px;
+  }
+  .hero-inner{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .logo-mark{
+    width: 52px; height: 52px; flex: none;
+    border-radius: 14px;
+    background: linear-gradient(145deg, var(--teal), var(--teal-deep));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  }
+  .logo-mark svg{ width: 28px; height: 28px; }
+  .hero-text h1{
+    color: #fff;
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .hero-text p{
+    color: #c7bfec;
+    font-size: 0.98rem;
+    margin-top: 4px;
+    max-width: 60ch;
+  }
+  .badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--amber-tint);
+    background: rgba(242,121,10,0.16);
+    border: 1px solid rgba(242,121,10,0.4);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .badge .dot{ width:6px; height:6px; border-radius:50%; background: var(--amber); box-shadow: 0 0 0 3px rgba(242,121,10,0.25); }
+
+  main{ padding-top: 32px; }
+
+  /* ---------- landing / briefing ---------- */
+  .briefing{
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: 20px;
+    padding: clamp(20px, 3vw, 34px);
+    display: grid;
+    gap: 22px;
+    box-shadow: 0 18px 40px rgba(12, 8, 32, 0.35);
+  }
+  .briefing-top{ display:flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items:flex-start; }
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--teal-deep);
+    text-transform: uppercase;
+  }
+  .briefing h2{ font-size: 1.5rem; margin-top: 6px; color: var(--ink); }
+  .briefing .lede{ color: var(--ink-soft); font-size: 1rem; margin-top: 10px; max-width: 62ch; line-height: 1.6; }
+
+  .why-extended{
+    background: var(--surface-muted);
+    border: 1px solid var(--surface-edge);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 14px;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .why-extended dt{ font-family: var(--font-mono); font-weight: 700; color: var(--ink); }
+  .why-extended dd{ margin: 0 0 10px; }
+  .mono-inline{ font-family: var(--font-mono); background: var(--surface-edge); padding: 1px 5px; border-radius: 4px; }
+
+  .roadmap{ display: grid; gap: 10px; }
+  .roadmap-item{
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--surface-edge);
+  }
+  .roadmap-num{
+    font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem;
+    width: 26px; height: 26px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--teal-tint); color: var(--teal-deep); flex: none;
+  }
+  .roadmap-item h3{ font-size: 0.95rem; color: var(--ink); }
+  .roadmap-item span{ font-size: 0.85rem; color: var(--ink-faint); }
+
+  .start-btn{
+    justify-self: start;
+    background: linear-gradient(145deg, var(--amber), var(--amber-deep));
+    color: #fff; border: none; border-radius: 12px;
+    font-weight: 700; font-size: 1rem;
+    padding: 13px 26px;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(242,121,10,0.35);
+  }
+  .start-btn:hover{ filter: brightness(1.05); }
+
+  /* ---------- workspace ---------- */
+  #workspace[hidden], #landing[hidden]{ display:none; }
+
+  .toolbar{
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .toolbar .field{ display:flex; flex-direction:column; gap:4px; }
+  .toolbar label{ font-size: 0.72rem; color: var(--ink-faint); font-weight: 600; letter-spacing: 0.03em; }
+  .toolbar input[type=text]{
+    font-family: var(--font-body);
+    border: 1px solid var(--surface-edge);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 0.9rem;
+    width: 180px;
+    background: var(--surface-muted);
+    color: var(--ink);
+  }
+  .toolbar-spacer{ flex: 1; }
+  .ghost-btn{
+    background: transparent;
+    border: 1px solid var(--surface-edge);
+    color: var(--ink-soft);
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ghost-btn:hover{ background: var(--surface-muted); }
+  .solid-btn{
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .solid-btn:hover{ background: var(--teal-deep); }
+  .check-toggle{ display:flex; align-items:center; gap: 7px; font-size: 0.82rem; color: var(--ink-soft); cursor:pointer; }
+  .check-toggle input{ width: 16px; height:16px; accent-color: var(--teal); }
+
+  .workspace-grid{
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 320px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 900px){
+    .workspace-grid{ grid-template-columns: 1fr; }
+  }
+  .workspace-main{ display: grid; gap: 20px; min-width: 0; }
+  .workspace-side{ min-width: 0; }
+  @media (min-width: 901px){
+    .workspace-side{ position: sticky; top: 16px; }
+  }
+
+  .tab-strip{
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    margin-bottom: -1px;
+  }
+  .tab-btn{
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    background: var(--panel-dark);
+    color: #cfc8ef;
+    border: 1px solid var(--panel-dark-edge);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    padding: 10px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex: none;
+  }
+  .tab-btn[aria-selected="true"]{
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .tab-btn[disabled]{
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  .tab-btn .lock{ margin-right: 4px; }
+  .tab-btn .check{ margin-left: 5px; color: var(--success); }
+
+  .level-panel{
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: 0 16px 16px 16px;
+    padding: clamp(18px, 3vw, 28px);
+    display: grid;
+    gap: 20px;
+  }
+  .level-head .eyebrow{ color: var(--amber-deep); }
+  .level-head h2{ font-size: 1.3rem; margin-top: 4px; }
+  .level-head .prompt{ color: var(--ink-soft); margin-top: 8px; max-width: 66ch; line-height: 1.55; }
+
+  .part{ display: grid; gap: 14px; padding-top: 14px; border-top: 1px dashed var(--surface-edge); }
+  .part:first-of-type{ border-top: none; padding-top: 0; }
+  .part-label{ font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; color: var(--ink-faint); text-transform: uppercase; }
+
+  .terminal{
+    background: linear-gradient(180deg, var(--bg-deep), var(--panel-dark));
+    border: 1px solid var(--panel-dark-edge);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .terminal-bar{
+    display:flex; align-items:center; gap:8px;
+    padding: 9px 14px;
+    background: rgba(0,0,0,0.22);
+    border-bottom: 1px solid var(--panel-dark-edge);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: #a79cdb;
+  }
+  .terminal-bar .live{ width:7px; height:7px; border-radius:50%; background: var(--success); box-shadow: 0 0 0 3px rgba(28,154,83,0.3); }
+  .terminal-body{
+    padding: 18px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .code-chip{
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: #eae6ff;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(216,208,255,0.18);
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .code-chip:hover{ background: rgba(15,148,136,0.35); border-color: var(--teal); }
+  .code-chip.extended{ border-color: rgba(242,121,10,0.55); }
+  .code-chip.extended::after{ content:'ext'; font-size:0.55rem; color: var(--amber-tint); margin-left: 6px; vertical-align: super; }
+  .code-chip.bin{ letter-spacing: 0.08em; }
+  .char-chip{
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--bg-deep);
+    background: #fff;
+    border-radius: 7px;
+    padding: 5px 9px;
+    cursor: pointer;
+    min-width: 1.4em;
+    text-align: center;
+  }
+  .char-chip:hover{ background: var(--teal-tint); }
+
+  .answer-row{ display: grid; gap: 8px; }
+  .answer-row label{ font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+  .answer-row .hint{ font-size: 0.78rem; color: var(--ink-faint); }
+  .answer-row input[type=text]{
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    border: 1px solid var(--surface-edge);
+    background: var(--surface-muted);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--ink);
+    width: 100%;
+    max-width: 480px;
+  }
+  .answer-row input[type=text]:focus{ background: #fff; }
+
+  .part-actions{ display:flex; align-items:center; gap: 12px; flex-wrap: wrap; }
+  .status-line{ font-size: 0.88rem; font-weight: 600; min-height: 1.3em; }
+  .status-line.ok{ color: var(--success); }
+  .status-line.bad{ color: var(--danger); }
+
+  .level-footer{ display:flex; justify-content: flex-end; }
+  .level-footer .solid-btn[disabled]{ opacity:0.5; cursor:not-allowed; }
+
+  /* ---------- debrief ---------- */
+  .debrief{ display: grid; gap: 18px; }
+  .debrief .roadmap-num{ background: var(--success-tint); color: var(--success); }
+
+  /* ---------- tools panel ---------- */
+  .tools-card{
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: 16px;
+    padding: 18px 20px;
+  }
+  .tools-card h3{ font-size: 1.02rem; color: var(--ink); }
+  .tools-card .sub{ font-size: 0.85rem; color: var(--ink-soft); margin-top: 4px; }
+
+  .inspector{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(120px,1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+  @media (max-width: 620px){ .inspector{ grid-template-columns: 1fr; } }
+  .inspector .box label{ display:block; font-size: 0.72rem; color: var(--ink-faint); font-weight:700; letter-spacing:0.05em; margin-bottom: 5px; }
+  .inspector input{
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    text-align: center;
+    border: 1px solid var(--surface-edge);
+    background: var(--surface-muted);
+    border-radius: 10px;
+    padding: 10px 8px;
+    color: var(--ink);
+  }
+  .bitgrid{ display:flex; gap:6px; margin-top: 14px; flex-wrap: wrap; }
+  .bit{
+    width: 44px; height: 54px;
+    border-radius: 8px;
+    background: var(--surface-muted);
+    border: 1px solid var(--surface-edge);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    user-select:none;
+  }
+  .bit .place{ font-size: 0.6rem; color: var(--ink-faint); }
+  .bit .val{ font-size: 1.1rem; font-weight: 700; color: var(--ink-soft); }
+  .bit.on{ background: var(--amber); border-color: var(--amber-deep); }
+  .bit.on .val, .bit.on .place{ color: #fff; }
+  .inspector-meta{ margin-top: 10px; font-size: 0.85rem; color: var(--ink-soft); }
+  .inspector-meta strong{ color: var(--ink); }
+
+  details.reference summary{
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--ink);
+    list-style: none;
+    display:flex; align-items:center; gap: 8px;
+  }
+  details.reference summary::-webkit-details-marker{ display:none; }
+  details.reference summary::before{ content:'▸'; color: var(--teal); transition: transform 0.15s; }
+  details.reference[open] summary::before{ transform: rotate(90deg); }
+
+  .filter-row{ display:flex; gap:8px; margin: 14px 0; flex-wrap: wrap; }
+  .filter-btn{
+    font-size: 0.78rem; font-weight:600;
+    background: var(--surface-muted); color: var(--ink-soft);
+    border: 1px solid var(--surface-edge);
+    border-radius: 999px;
+    padding: 6px 13px;
+    cursor: pointer;
+  }
+  .filter-btn[aria-pressed="true"]{ background: var(--teal); color: #fff; border-color: var(--teal); }
+
+  .ascii-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 6px;
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 4px 4px 4px 0;
+  }
+  .workspace-side .ascii-grid{
+    grid-template-columns: repeat(2, 1fr);
+    max-height: 62vh;
+  }
+  @media (max-width: 900px){
+    .workspace-side .ascii-grid{ grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); max-height: 360px; }
+  }
+  .ascii-cell{
+    border: 1px solid var(--surface-edge);
+    border-radius: 8px;
+    padding: 6px 7px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    background: var(--surface-muted);
+  }
+  .ascii-cell .code{ font-weight: 700; color: var(--ink); }
+  .ascii-cell .glyph{ color: var(--ink-soft); margin-left: 4px; }
+  .ascii-cell.standard{ border-left: 3px solid var(--teal); }
+  .ascii-cell.extended{ border-left: 3px solid var(--amber); }
+  .ascii-cell.control{ border-left: 3px solid var(--ink-faint); opacity: 0.75; }
+  .ascii-cell.unassigned{ opacity: 0.35; }
+  .ascii-cell[hidden]{ display:none; }
+
+  footer.site{
+    text-align:center;
+    color: #9a91c9;
+    font-size: 0.82rem;
+    padding: 26px 20px 10px;
+  }
+
+  /* scrollbar (webkit) for grid */
+  .ascii-grid::-webkit-scrollbar{ width: 9px; }
+  .ascii-grid::-webkit-scrollbar-thumb{ background: var(--surface-edge); border-radius: 6px; }
+</style>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 15C4 15 6 9 12 9C18 9 20 15 20 15" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M7 17.5C7 17.5 8.5 13 12 13C15.5 13 17 17.5 17 17.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="12" cy="19.5" r="1.4" fill="#fff"/>
+        <circle cx="12" cy="6" r="1.6" fill="#fff"/>
+      </svg>
+    </div>
+    <div class="hero-text">
+      <h1>Signal Room</h1>
+      <p>Decode intercepted transmissions and log your own replies using the 8-bit extended ASCII table.</p>
+      <div class="badge"><span class="dot"></span>EXTENDED ASCII · 0–255 · CSTEACH.UK</div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+  <section id="landing">
+    <div class="briefing">
+      <div class="briefing-top">
+        <div>
+          <div class="eyebrow">Duty briefing</div>
+          <h2>Welcome to the Signal Room</h2>
+          <p class="lede">You're the analyst on shift. Every message below arrives as numbers, not letters — that's how computers actually store text. Your job is to move between characters and their 8-bit codes in both directions, using the extended ASCII table (codes 0–255) as your reference.</p>
+        </div>
+      </div>
+
+      <dl class="why-extended">
+        <dt>Why "extended"?</dt>
+        <dd>Original 7-bit ASCII only defines 128 codes (0–127) — enough for English letters, digits and punctuation. An 8th bit doubles that range to 256 codes (0–255), so codes 128–255 were added to represent accented letters, currency symbols and other characters the first 128 couldn't reach.</dd>
+        <dt>Why 8 bits?</dt>
+        <dd>One bit is a switch: on or off. Eight of them in a row give 2⁸ = 256 possible combinations — exactly enough to number every character from 0 to 255. <span class="mono-inline">01001000</span> is one byte; it's also the letter <strong>H</strong>.</dd>
+      </dl>
+
+      <div class="roadmap">
+        <div class="roadmap-item"><span class="roadmap-num">1</span><div><h3>First Transmission</h3><span>Decode a callsign from plain decimal codes</span></div></div>
+        <div class="roadmap-item"><span class="roadmap-num">2</span><div><h3>Reply Traffic</h3><span>Encode a message into ASCII codes</span></div></div>
+        <div class="roadmap-item"><span class="roadmap-num">3</span><div><h3>Foreign Desk</h3><span>Read a message that needs the extended table</span></div></div>
+        <div class="roadmap-item"><span class="roadmap-num">4</span><div><h3>Byte by Byte</h3><span>Convert raw 8-bit binary into text</span></div></div>
+        <div class="roadmap-item"><span class="roadmap-num">5</span><div><h3>Full Decrypt</h3><span>Decode the intercept, then encode the reply</span></div></div>
+      </div>
+
+      <button class="start-btn" id="startBtn" type="button">Start shift →</button>
+    </div>
+  </section>
+
+  <section id="workspace" hidden>
+    <div class="toolbar">
+      <button class="ghost-btn" id="backBtn" type="button">← Missions</button>
+      <div class="field">
+        <label for="nameInput">Analyst name</label>
+        <input type="text" id="nameInput" placeholder="Type your name" autocomplete="off">
+      </div>
+      <label class="check-toggle"><input type="checkbox" id="readingToggle">Reading mode (dyslexia-friendly)</label>
+      <div class="toolbar-spacer"></div>
+      <button class="solid-btn" id="pdfBtn" type="button">Download my work (PDF)</button>
+    </div>
+
+    <div class="workspace-grid">
+      <div class="workspace-main">
+        <div class="tab-strip" id="tabStrip" role="tablist"></div>
+        <div class="level-panel" id="levelPanel"></div>
+
+        <div class="tools-card">
+          <h3>Byte inspector</h3>
+          <p class="sub">Type a character, a decimal code (0–255) or an 8-bit binary value — the other two update instantly. Click a bit to flip it.</p>
+          <div class="inspector">
+            <div class="box"><label for="inspChar">Character</label><input type="text" id="inspChar" maxlength="1"></div>
+            <div class="box"><label for="inspDec">Decimal</label><input type="text" id="inspDec" inputmode="numeric"></div>
+            <div class="box"><label for="inspBin">Binary (8-bit)</label><input type="text" id="inspBin" inputmode="numeric" maxlength="8"></div>
+          </div>
+          <div class="bitgrid" id="bitGrid"></div>
+          <p class="inspector-meta" id="inspMeta"></p>
+        </div>
+      </div>
+
+      <aside class="workspace-side">
+        <div class="tools-card">
+          <details class="reference" id="refDetails" open>
+            <summary>Full extended ASCII table (0–255)</summary>
+            <div class="filter-row" id="filterRow">
+              <button class="filter-btn" data-filter="all" aria-pressed="true" type="button">All</button>
+              <button class="filter-btn" data-filter="control" aria-pressed="false" type="button">Control 0–31</button>
+              <button class="filter-btn" data-filter="standard" aria-pressed="false" type="button">Standard 32–126</button>
+              <button class="filter-btn" data-filter="extended" aria-pressed="false" type="button">Extended 128–255</button>
+            </div>
+            <div class="ascii-grid" id="asciiGrid"></div>
+          </details>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <footer class="site">csteach.uk · Signal Room · Extended ASCII (8-bit) training</footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- ASCII / CP1252 table ---------------- */
+  var CONTROL_NAMES = ["NUL","SOH","STX","ETX","EOT","ENQ","ACK","BEL","BS","TAB","LF","VT","FF","CR","SO","SI",
+    "DLE","DC1","DC2","DC3","DC4","NAK","SYN","ETB","CAN","EM","SUB","ESC","FS","GS","RS","US"];
+  var CP1252_128_159 = {128:"€",130:"‚",131:"ƒ",132:"„",133:"…",134:"†",135:"‡",
+    136:"ˆ",137:"‰",138:"Š",139:"‹",140:"Œ",142:"Ž",145:"‘",146:"’",
+    147:"“",148:"”",149:"•",150:"–",151:"—",152:"˜",153:"™",154:"š",
+    155:"›",156:"œ",158:"ž",159:"Ÿ"};
+
+  var TABLE = [];
+  for (var i = 0; i <= 255; i++){
+    var entry = { code:i, char:null, label:"", category:"" };
+    if (i <= 31 || i === 127){
+      entry.category = "control";
+      entry.label = i === 127 ? "DEL" : CONTROL_NAMES[i];
+    } else if (i >= 32 && i <= 126){
+      entry.category = "standard";
+      entry.char = String.fromCharCode(i);
+      entry.label = i === 32 ? "SPACE" : entry.char;
+    } else if (i >= 128 && i <= 159){
+      if (CP1252_128_159[i]){
+        entry.category = "extended";
+        entry.char = CP1252_128_159[i];
+        entry.label = entry.char;
+      } else {
+        entry.category = "unassigned";
+        entry.label = "—";
+      }
+    } else {
+      entry.category = "extended";
+      entry.char = String.fromCharCode(i);
+      entry.label = i === 160 ? "NBSP" : (i === 173 ? "SHY" : entry.char);
+    }
+    TABLE[i] = entry;
+  }
+  var CHAR_TO_CODE = {};
+  TABLE.forEach(function(e){ if (e.char !== null && !(e.char in CHAR_TO_CODE)) CHAR_TO_CODE[e.char] = e.code; });
+
+  function toBin8(n){ return n.toString(2).padStart(8,"0"); }
+  function fromBin8(s){ return parseInt(s,2); }
+
+  /* ---------------- level data ---------------- */
+  function decodeCodes(str){
+    return str.split(/\s+/).filter(Boolean).map(Number);
+  }
+  function codesToText(codes){ return codes.map(function(c){ return TABLE[c] && TABLE[c].char !== null ? TABLE[c].char : ""; }).join(""); }
+  function textToCodes(str){ return str.split("").map(function(ch){ return CHAR_TO_CODE[ch]; }); }
+  function binsToText(bins){ return bins.map(function(b){ return TABLE[fromBin8(b)].char; }).join(""); }
+
+  var LEVELS = [
+    {
+      id: "l1", title: "First Transmission",
+      prompt: "0400 hrs. A callsign just came through as plain decimal code. Decode it to confirm the channel is live — type it exactly, matching upper and lower case.",
+      parts: [
+        { type: "decode-dec", codes: decodeCodes("65 71 69 78 84 32 79 78 76 73 78 69"), answer: "AGENT ONLINE",
+          label: "Decode the transmission" }
+      ]
+    },
+    {
+      id: "l2", title: "Reply Traffic",
+      prompt: "Command wants your reply logged before it's sent. Convert the message into its ASCII decimal codes — separate each code with a space.",
+      parts: [
+        { type: "encode-dec", text: "Hold position.", answer: textToCodes("Hold position."),
+          label: "Encode: “Hold position.”" }
+      ]
+    },
+    {
+      id: "l3", title: "Foreign Desk",
+      prompt: "An overseas contact's message uses letters outside the basic 128 codes. Switch to the extended table (128–255) to read it.",
+      parts: [
+        { type: "decode-dec", codes: decodeCodes("67 65 70 201 32 90 220 82 73 67 72"), answer: "CAFÉ ZÜRICH",
+          label: "Decode the transmission" }
+      ]
+    },
+    {
+      id: "l4", title: "Byte by Byte",
+      prompt: "The line has dropped to a low-bandwidth channel — the message now arrives as raw 8-bit binary. Convert each byte to decimal, then to a character.",
+      parts: [
+        { type: "decode-bin", bins: ["01001000","01000101","01001100","01010000"], answer: "HELP",
+          label: "Decode the binary transmission" }
+      ]
+    },
+    {
+      id: "l5", title: "Full Decrypt",
+      prompt: "Everything you've learned, in one exchange. Decode the intercept, then log your confirmation as ASCII codes.",
+      parts: [
+        { type: "decode-dec", codes: decodeCodes("84 65 82 71 69 84 58 32 82 69 78 201 32 68 85 66 79 73 83"),
+          answer: "TARGET: RENÉ DUBOIS", label: "Decode the intercept" },
+        { type: "encode-dec", text: "CONFIRMED", answer: textToCodes("CONFIRMED"),
+          label: "Encode your reply: “CONFIRMED”" }
+      ]
+    }
+  ];
+
+  /* ---------------- state ---------------- */
+  var STORE_KEY = "signalRoomProgress_v1";
+  var state = loadState();
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e){}
+    return { name:"", completed:{}, answers:{}, readingMode:false };
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e){}
+  }
+
+  var activeLevel = 0;
+
+  /* ---------------- DOM refs ---------------- */
+  var landing = document.getElementById("landing");
+  var workspace = document.getElementById("workspace");
+  var startBtn = document.getElementById("startBtn");
+  var backBtn = document.getElementById("backBtn");
+  var nameInput = document.getElementById("nameInput");
+  var readingToggle = document.getElementById("readingToggle");
+  var pdfBtn = document.getElementById("pdfBtn");
+  var tabStrip = document.getElementById("tabStrip");
+  var levelPanel = document.getElementById("levelPanel");
+
+  nameInput.value = state.name || "";
+  readingToggle.checked = !!state.readingMode;
+  document.documentElement.classList.toggle("reading-mode", !!state.readingMode);
+
+  nameInput.addEventListener("input", function(){
+    state.name = nameInput.value; saveState();
+  });
+  readingToggle.addEventListener("change", function(){
+    state.readingMode = readingToggle.checked;
+    document.documentElement.classList.toggle("reading-mode", state.readingMode);
+    saveState();
+  });
+
+  startBtn.addEventListener("click", function(){
+    landing.hidden = true; workspace.hidden = false;
+    renderTabs(); renderLevel(activeLevel);
+  });
+  backBtn.addEventListener("click", function(){
+    workspace.hidden = true; landing.hidden = false;
+  });
+
+  function isUnlocked(idx){ return idx === 0 || !!state.completed[LEVELS[idx-1].id]; }
+  function isComplete(idx){ return !!state.completed[LEVELS[idx].id]; }
+
+  function renderTabs(){
+    tabStrip.innerHTML = "";
+    LEVELS.forEach(function(lvl, idx){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "tab-btn";
+      btn.setAttribute("role","tab");
+      btn.setAttribute("aria-selected", idx === activeLevel ? "true" : "false");
+      var unlocked = isUnlocked(idx);
+      btn.disabled = !unlocked;
+      btn.innerHTML = (unlocked ? "" : "<span class='lock'>🔒</span>") +
+        "Level " + (idx+1) + (isComplete(idx) ? " <span class='check'>✓</span>" : "");
+      btn.title = lvl.title;
+      if (unlocked){
+        btn.addEventListener("click", function(){ activeLevel = idx; renderTabs(); renderLevel(idx); });
+      }
+      tabStrip.appendChild(btn);
+    });
+  }
+
+  function renderLevel(idx){
+    var lvl = LEVELS[idx];
+    levelPanel.innerHTML = "";
+
+    var head = document.createElement("div");
+    head.className = "level-head";
+    head.innerHTML = "<div class='eyebrow'>Level " + (idx+1) + " of " + LEVELS.length + "</div>" +
+      "<h2>" + lvl.title + "</h2>" +
+      "<p class='prompt'>" + lvl.prompt + "</p>";
+    levelPanel.appendChild(head);
+
+    var partResults = [];
+
+    lvl.parts.forEach(function(part, pIdx){
+      var partEl = document.createElement("div");
+      partEl.className = "part";
+
+      var partLabel = document.createElement("div");
+      partLabel.className = "part-label";
+      partLabel.textContent = lvl.parts.length > 1 ? "Part " + (pIdx+1) : "Transmission";
+      partEl.appendChild(partLabel);
+
+      var terminal = document.createElement("div");
+      terminal.className = "terminal";
+      var isEncode = part.type === "encode-dec";
+      terminal.innerHTML = "<div class='terminal-bar'><span class='live'></span>" +
+        (isEncode ? "SOURCE TEXT" : (part.type === "decode-bin" ? "INCOMING — BINARY" : "INCOMING — DECIMAL")) + "</div>";
+      var body = document.createElement("div");
+      body.className = "terminal-body";
+
+      if (part.type === "decode-dec"){
+        part.codes.forEach(function(c){
+          var chip = document.createElement("span");
+          chip.className = "code-chip" + (TABLE[c].category === "extended" ? " extended" : "");
+          chip.textContent = c;
+          chip.title = "Click to load into the byte inspector";
+          chip.addEventListener("click", function(){ setInspectorFromDec(c); });
+          body.appendChild(chip);
+        });
+      } else if (part.type === "decode-bin"){
+        part.bins.forEach(function(b){
+          var chip = document.createElement("span");
+          chip.className = "code-chip bin";
+          chip.textContent = b;
+          chip.title = "Click to load into the byte inspector";
+          chip.addEventListener("click", function(){ setInspectorFromBin(b); });
+          body.appendChild(chip);
+        });
+      } else if (part.type === "encode-dec"){
+        part.text.split("").forEach(function(ch){
+          var chip = document.createElement("span");
+          chip.className = "char-chip";
+          chip.textContent = ch === " " ? "␣" : ch;
+          chip.title = "Click to load into the byte inspector";
+          chip.addEventListener("click", function(){ setInspectorFromChar(ch); });
+          body.appendChild(chip);
+        });
+      }
+      terminal.appendChild(body);
+      partEl.appendChild(terminal);
+
+      var answerRow = document.createElement("div");
+      answerRow.className = "answer-row";
+      var inputId = "ans_" + lvl.id + "_" + pIdx;
+      answerRow.innerHTML = "<label for='" + inputId + "'>" + part.label + "</label>" +
+        (isEncode ? "<p class='hint'>Enter the decimal codes separated by spaces.</p>" : "<p class='hint'>Case matters — ASCII treats upper and lower case as different codes.</p>") +
+        "<input type='text' id='" + inputId + "' autocomplete='off' spellcheck='false'>";
+      partEl.appendChild(answerRow);
+
+      var input = answerRow.querySelector("input");
+      var savedAns = state.answers[inputId];
+      if (savedAns) input.value = savedAns;
+
+      var actions = document.createElement("div");
+      actions.className = "part-actions";
+      var checkBtn = document.createElement("button");
+      checkBtn.type = "button";
+      checkBtn.className = "solid-btn";
+      checkBtn.textContent = "Check answer";
+      var status = document.createElement("span");
+      status.className = "status-line";
+      status.setAttribute("aria-live", "polite");
+      actions.appendChild(checkBtn);
+      actions.appendChild(status);
+      partEl.appendChild(actions);
+
+      var partOk = false;
+      function evaluate(){
+        var val = input.value;
+        state.answers[inputId] = val;
+        if (isEncode){
+          var given = (val.match(/\d+/g) || []).map(Number);
+          partOk = given.length === part.answer.length && given.every(function(n,i){ return n === part.answer[i]; });
+        } else {
+          partOk = val.trim() === part.answer;
+        }
+        status.textContent = partOk ? "✓ Correct" : "Not quite — check the byte inspector and try again.";
+        status.className = "status-line " + (partOk ? "ok" : "bad");
+        partResults[pIdx] = partOk;
+        saveState();
+        updateFooter();
+      }
+      checkBtn.addEventListener("click", evaluate);
+      input.addEventListener("keydown", function(e){ if (e.key === "Enter") evaluate(); });
+      partResults[pIdx] = false;
+
+      levelPanel.appendChild(partEl);
+    });
+
+    var footer = document.createElement("div");
+    footer.className = "level-footer";
+    var nextBtn = document.createElement("button");
+    nextBtn.type = "button";
+    nextBtn.className = "solid-btn";
+    nextBtn.disabled = true;
+    nextBtn.textContent = idx === LEVELS.length - 1 ? "Finish shift" : "Unlock next level →";
+    nextBtn.addEventListener("click", function(){
+      if (idx < LEVELS.length - 1){
+        activeLevel = idx + 1; renderTabs(); renderLevel(activeLevel);
+      } else {
+        celebrate(true);
+        showDebrief();
+      }
+    });
+    footer.appendChild(nextBtn);
+    levelPanel.appendChild(footer);
+
+    function updateFooter(){
+      var allOk = lvl.parts.every(function(_, i){ return partResults[i]; });
+      if (allOk && !state.completed[lvl.id]){
+        state.completed[lvl.id] = true; saveState(); renderTabs();
+        celebrate(false);
+      } else if (allOk){
+        saveState();
+      }
+      nextBtn.disabled = !allOk;
+    }
+
+    if (isComplete(idx)){
+      lvl.parts.forEach(function(_, i){ partResults[i] = true; });
+      nextBtn.disabled = false;
+    }
+  }
+
+  function showDebrief(){
+    tabStrip.querySelectorAll(".tab-btn").forEach(function(b){ b.setAttribute("aria-selected","false"); });
+    levelPanel.innerHTML = "";
+    var doneCount = LEVELS.filter(function(l){ return state.completed[l.id]; }).length;
+    var card = document.createElement("div");
+    card.className = "debrief";
+    card.innerHTML = "<div class='eyebrow'>Debrief</div>" +
+      "<h2>Shift complete, " + escapeHtml(state.name || "Analyst") + "</h2>" +
+      "<p class='prompt'>Every intercept on this shift has been logged — " + doneCount + " of " + LEVELS.length + " levels complete.</p>";
+    var list = document.createElement("div");
+    list.className = "roadmap";
+    LEVELS.forEach(function(l, i){
+      var row = document.createElement("div");
+      row.className = "roadmap-item";
+      row.innerHTML = "<span class='roadmap-num'>" + (state.completed[l.id] ? "✓" : (i+1)) + "</span><div><h3>" + l.title + "</h3></div>";
+      list.appendChild(row);
+    });
+    var actions = document.createElement("div");
+    actions.className = "part-actions";
+    var dlBtn = document.createElement("button");
+    dlBtn.type = "button"; dlBtn.className = "solid-btn"; dlBtn.textContent = "Download my work (PDF)";
+    dlBtn.addEventListener("click", generatePdf);
+    var reviewBtn = document.createElement("button");
+    reviewBtn.type = "button"; reviewBtn.className = "ghost-btn"; reviewBtn.textContent = "Review a level";
+    reviewBtn.addEventListener("click", function(){ activeLevel = 0; renderTabs(); renderLevel(0); });
+    var briefBtn = document.createElement("button");
+    briefBtn.type = "button"; briefBtn.className = "ghost-btn"; briefBtn.textContent = "Return to briefing";
+    briefBtn.addEventListener("click", function(){ workspace.hidden = true; landing.hidden = false; });
+    actions.appendChild(dlBtn); actions.appendChild(reviewBtn); actions.appendChild(briefBtn);
+    card.appendChild(list);
+    card.appendChild(actions);
+    levelPanel.appendChild(card);
+  }
+
+  /* ---------------- celebration: confetti + chime ---------------- */
+  var audioCtx = null;
+  function getAudioCtx(){
+    if (!audioCtx){
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      audioCtx = new Ctx();
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+  function playChime(big){
+    try{
+      var ctx = getAudioCtx();
+      if (!ctx) return;
+      var now = ctx.currentTime;
+      var notes = big ? [523.25, 659.25, 783.99, 1046.50] : [659.25, 987.77];
+      notes.forEach(function(freq, i){
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        var t0 = now + i * 0.09;
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(0.16, t0 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.35);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(t0);
+        osc.stop(t0 + 0.4);
+      });
+    } catch(e){}
+  }
+  function spawnConfetti(count){
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var canvas = document.createElement("canvas");
+    canvas.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;";
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+    var ctx = canvas.getContext("2d");
+    var colors = ["#0f9488", "#f2790a", "#eae6ff", "#1c9a53", "#ffffff"];
+    var particles = [];
+    for (var i = 0; i < count; i++){
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * canvas.height * 0.4,
+        w: 5 + Math.random() * 6,
+        h: 8 + Math.random() * 8,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 3,
+        vy: 2 + Math.random() * 3,
+        rot: Math.random() * Math.PI,
+        vrot: (Math.random() - 0.5) * 0.3
+      });
+    }
+    var start = Date.now();
+    function frame(){
+      var elapsed = Date.now() - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(function(p){
+        p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.rot += p.vrot;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if (elapsed < 2600){
+        requestAnimationFrame(frame);
+      } else {
+        canvas.remove();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  function celebrate(big){
+    spawnConfetti(big ? 160 : 70);
+    playChime(big);
+  }
+
+  /* ---------------- byte inspector ---------------- */
+  var inspChar = document.getElementById("inspChar");
+  var inspDec = document.getElementById("inspDec");
+  var inspBin = document.getElementById("inspBin");
+  var bitGrid = document.getElementById("bitGrid");
+  var inspMeta = document.getElementById("inspMeta");
+  var PLACES = [128,64,32,16,8,4,2,1];
+  var bits = [0,0,0,0,1,0,0,0]; // default H = 72
+
+  PLACES.forEach(function(p, i){
+    var b = document.createElement("div");
+    b.className = "bit";
+    b.innerHTML = "<span class='place'>" + p + "</span><span class='val'>0</span>";
+    b.addEventListener("click", function(){
+      bits[i] = bits[i] ? 0 : 1;
+      syncFromBits();
+    });
+    bitGrid.appendChild(b);
+  });
+
+  function syncFromBits(){
+    var dec = 0;
+    PLACES.forEach(function(p,i){ dec += bits[i]*p; });
+    paintBits();
+    fillInspector(dec);
+  }
+  function paintBits(){
+    Array.prototype.forEach.call(bitGrid.children, function(el, i){
+      el.classList.toggle("on", !!bits[i]);
+      el.querySelector(".val").textContent = bits[i];
+    });
+  }
+  function fillInspector(dec){
+    var entry = TABLE[dec];
+    inspDec.value = dec;
+    inspBin.value = toBin8(dec);
+    inspChar.value = entry.char !== null ? entry.char : "";
+    bits = toBin8(dec).split("").map(Number);
+    paintBits();
+    var metaLabel = entry.category === "control" ? ("control code — " + entry.label) :
+      entry.category === "unassigned" ? "unassigned in this table" :
+      entry.category === "extended" ? "extended ASCII (128–255)" : "standard ASCII (32–126)";
+    inspMeta.innerHTML = "<strong>" + dec + "</strong> = <strong>" + toBin8(dec) + "</strong> — " + metaLabel;
+  }
+  function setInspectorFromDec(dec){ fillInspector(Math.max(0,Math.min(255,dec))); }
+  function setInspectorFromBin(bin){ fillInspector(fromBin8(bin)); }
+  function setInspectorFromChar(ch){
+    var code = CHAR_TO_CODE[ch];
+    if (code !== undefined) fillInspector(code);
+  }
+
+  inspChar.addEventListener("input", function(){
+    var ch = inspChar.value;
+    if (ch && CHAR_TO_CODE[ch] !== undefined) fillInspector(CHAR_TO_CODE[ch]);
+  });
+  inspDec.addEventListener("input", function(){
+    var n = parseInt(inspDec.value, 10);
+    if (!isNaN(n) && n >= 0 && n <= 255) fillInspector(n);
+  });
+  inspBin.addEventListener("input", function(){
+    var v = inspBin.value.replace(/[^01]/g,"");
+    if (v.length === 8) fillInspector(fromBin8(v));
+  });
+
+  syncFromBits();
+
+  /* ---------------- reference table ---------------- */
+  var asciiGrid = document.getElementById("asciiGrid");
+  TABLE.forEach(function(entry){
+    var cell = document.createElement("div");
+    cell.className = "ascii-cell " + entry.category;
+    cell.dataset.category = entry.category;
+    cell.innerHTML = "<span class='code'>" + entry.code + "</span><span class='glyph'>" + escapeHtml(entry.label) + "</span>";
+    asciiGrid.appendChild(cell);
+  });
+  function escapeHtml(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+  document.getElementById("filterRow").addEventListener("click", function(e){
+    var btn = e.target.closest(".filter-btn");
+    if (!btn) return;
+    Array.prototype.forEach.call(document.querySelectorAll(".filter-btn"), function(b){ b.setAttribute("aria-pressed","false"); });
+    btn.setAttribute("aria-pressed","true");
+    var f = btn.dataset.filter;
+    Array.prototype.forEach.call(asciiGrid.children, function(cell){
+      cell.hidden = f !== "all" && cell.dataset.category !== f;
+    });
+  });
+
+  /* ---------------- PDF export ---------------- */
+  pdfBtn.addEventListener("click", generatePdf);
+  function generatePdf(){
+    if (!window.jspdf || !window.jspdf.jsPDF){
+      alert("Couldn't load the PDF tool — check your connection and try again.");
+      return;
+    }
+    var doc = new window.jspdf.jsPDF();
+    var y = 20;
+    doc.setFont("helvetica","bold"); doc.setFontSize(16);
+    doc.text("Signal Room — Field Report", 15, y); y += 8;
+    doc.setFont("helvetica","normal"); doc.setFontSize(11);
+    doc.text("Analyst: " + (state.name || "Unnamed"), 15, y); y += 6;
+    doc.text("Date: " + new Date().toLocaleDateString(), 15, y); y += 10;
+
+    LEVELS.forEach(function(lvl, idx){
+      if (y > 265){ doc.addPage(); y = 20; }
+      var complete = !!state.completed[lvl.id];
+      doc.setFont("helvetica","bold"); doc.setFontSize(12);
+      doc.text((idx+1) + ". " + lvl.title + "  " + (complete ? "[Complete]" : "[In progress]"), 15, y); y += 7;
+      doc.setFont("helvetica","normal"); doc.setFontSize(10);
+      lvl.parts.forEach(function(part, pIdx){
+        var key = "ans_" + lvl.id + "_" + pIdx;
+        var ans = state.answers[key] || "(not attempted)";
+        var lines = doc.splitTextToSize("   " + part.label + ": " + ans, 175);
+        lines.forEach(function(l){
+          if (y > 275){ doc.addPage(); y = 20; }
+          doc.text(l, 15, y); y += 5.5;
+        });
+      });
+      y += 4;
+    });
+
+    doc.save("signal-room-report.pdf");
+  }
+
+  /* ---------------- hot reload state (Claude Artifacts) ---------------- */
+  function boot(){ /* state already loaded from localStorage above */ }
+  if (window.claude && window.claude.hot){
+    window.claude.hot.snapshot(function(){ return { state: state }; });
+    if (window.claude.hot.ready){
+      window.claude.hot.ready(function(data){
+        if (data && data.state){ state = data.state; }
+        boot();
+      });
+    } else { boot(); }
+  } else { boot(); }
+})();
+</script>
